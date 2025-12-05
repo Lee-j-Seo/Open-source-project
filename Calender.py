@@ -21,7 +21,7 @@ calendar_frame.pack()
 def open_memo_window(year, month, day):
     win = tk.Toplevel(root)
     win.title(f"{year}-{month}-{day}")
-    win.geometry("260x180")
+    win.geometry("260x220")
 
     tk.Label(win, text=f"{year}-{month}-{day} 메모", font=("Consolas", 12)).pack(pady=5)
 
@@ -29,15 +29,31 @@ def open_memo_window(year, month, day):
     text_box.pack()
 
     key = (year, month, day)
-    if key in memo_data:
-        text_box.insert("1.0", memo_data[key])
+    existing = memo_data.get(key, "")
+
+    text_box.insert("1.0", existing)
+
+    if existing.strip() != "":
+        text_box.config(state="disabled")
+    else:
+        text_box.config(state="normal")
+
+    btn_frame = tk.Frame(win)
+    btn_frame.pack(pady=10)
+
+    def enable_edit():
+        text_box.config(state="normal")
 
     def save_memo():
         memo_data[key] = text_box.get("1.0", "end").strip()
         win.destroy()
         update_calendar(year, month)
 
-    tk.Button(win, text="저장", command=save_memo).pack(pady=5)
+    edit_btn = tk.Button(btn_frame, text="수정", width=8, command=enable_edit)
+    edit_btn.pack(side="left", padx=5)
+
+    save_btn = tk.Button(btn_frame, text="저장", width=8, command=save_memo)
+    save_btn.pack(side="left", padx=5)
 
 def update_calendar(year, month):
     title_label.config(text=f"{calendar.month_name[month]} {year}")
